@@ -1,10 +1,8 @@
-import mysql from 'mysql2';
+import {Sequelize, DataTypes} from 'sequelize';
 
-const dbConn = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ecommerce'
+const sequelize = new Sequelize("ecommerce", "root", "", {
+        host: 'localhost', 
+        dialect: 'mysql', 
 });
 
-export default dbConn.promise();
+export {sequelize, DataTypes};

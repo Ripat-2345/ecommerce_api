@@ -2,13 +2,14 @@ import bcrypt from 'bcrypt';
 import UsersModel from '../models/user_model.js';
 
 // todo: get all users
-const getAllUsers = async (req, res) => {
+const getAllUsers =  async (req, res) => {
     try {
-        const [data] = await UsersModel.getAllUsers();
-        res.status(200).json({
-            status: 200,
-            message: "GET all users",
-            data: data,
+        await UsersModel.findAll().then((results) => {
+            res.status(200).json({
+                status: 200,
+                message: "GET all users",
+                data: results,
+            });
         });
     } catch (error) {
         res.status(500).json({
@@ -25,11 +26,11 @@ const createNewUser = (req, res) => {
         // todo: encrypt password user
         bcrypt.hash(body.password, 10, async (err, hash) => {
             body.password = hash;
-            await UsersModel.createNewUser(body).then(() => {
+            await UsersModel.create(body).then((result) => {
                 res.status(200).json({
                     status: 200,
                     message: "POST create new user",
-                    data: body,
+                    data: result,
                 });
             });
         });
@@ -46,15 +47,32 @@ const updateUser = async (req, res) => {
     const idUser = req.params.id_user;
     const body = req.body;
     try {
-        await UsersModel.updateUser(idUser, body);
-        res.status(200).json({
-            status: 200,
-            message: `PATCH update user id:${idUser}`,
-            data: {
-                id: idUser,
-                ...body
-            },
-        });
+        if('password' in body){
+            bcrypt.hash(body.password, 10, async (err, hash) => {
+                body.password = hash;
+                await UsersModel.update(body, {where: {id: idUser}}).then(() => {
+                    res.status(200).json({
+                        status: 200,
+                        message: `PATCH update user id:${idUser}`,
+                        data: {
+                            id: +idUser,
+                            ...body
+                        },
+                    });
+                });
+            });
+        }else{
+            await UsersModel.update(body, {where: {id: idUser}}).then(() => {
+                res.status(200).json({
+                    status: 200,
+                    message: `PATCH update user id:${idUser}`,
+                    data: {
+                        id: +idUser,
+                        ...body
+                    },
+                });
+            });
+        }
     } catch (error) {
         res.status(500).json({
             message: "Server Error",
@@ -67,10 +85,11 @@ const updateUser = async (req, res) => {
 const deleteUser = async(req, res) => {
     const idUser = req.params.id_user;
     try {
-        await UsersModel.deleteUser(idUser);
-        res.status(200).json({
-            status: 200,
-            message: `DELETE delete user id:${idUser}`,
+        UsersModel.destroy({where: {id: idUser}}).then(() => {
+            res.status(200).json({
+                status: 200,
+                message: `DELETE delete user id:${idUser}`,
+            });
         });
     } catch (error) {
         res.status(500).json({
