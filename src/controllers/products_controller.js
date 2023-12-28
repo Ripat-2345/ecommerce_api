@@ -4,7 +4,7 @@ import ProductsModel from '../models/products_model.js';
 const getAllProduct = (req, res) => {
     const idProduct = req.params.id_product
     try {
-        ProductsModel.findAll({where:{id_product:idProduct}}).then((results) => {
+        ProductsModel.findAll().then((results) => {
             res.status(200).json({
                 status: 200,
                 message: "GET all cart by id_product",
@@ -19,7 +19,7 @@ const getAllProduct = (req, res) => {
     }
 };
 
-const createdProduct = (req, res) => {
+const createNewProduct = (req, res) => {
     const body = req.body;
     try {
         ProductsModel.create(body).then((result) => {
@@ -41,7 +41,7 @@ const updateProduct = (req, res) => {
     const idProduct = req.params.id_product;
     const body = req.body;
     try {
-        ProductsModel.update(body, {where: {id:idProduct, id_product: body.id_product}}).then((result) => {
+        ProductsModel.update(body, {where: {id:idProduct}}).then((result) => {
             res.status(200).json({
                 status: 200,
                 message: `PATCH update cart id:${idProduct}`,
@@ -78,7 +78,7 @@ const deleteProduct = (req, res) => {
 
 export default{
     getAllProduct,
-    createdProduct,
+    createNewProduct,
     updateProduct,
     deleteProduct,
 }

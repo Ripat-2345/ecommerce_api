@@ -1,19 +1,24 @@
 import express from 'express';
-import UserController from '../controllers/products_controller.js';
+import ProductController from '../controllers/products_controller.js';
 import AccessValidation from '../middleware/accessValidation.js';
 
 
 const router = express.Router();
 
+// todo: CREATE - POST
+router.post('/', AccessValidation, ProductController.createNewProduct);
 
-router.post('/', AccessValidation, UserController.createNewComment);
+// todo: READ - GET
+router.get('/', AccessValidation, ProductController.getAllProduct);
 
-router.get('/', AccessValidation, UserController.getAllProduct);
+// router.get('/:id_product', AccessValidation, ProductController.getAllProduct);
 
-router.get('/:id_product', AccessValidation, UserController.getAllProduct);
+// router.get('/:id_user', AccessValidation, ProductController.getAllProduct);
 
-router.get('/:id_user', AccessValidation, UserController.getAllProduct);
+// todo: UPDATE - PATCH
+router.patch('/:id_product', AccessValidation, ProductController.updateProduct);
 
-router.patch('/:id_product', AccessValidation, UserController.updateProduct);
+// todo: DELETE - DEL
+router.delete('/:id_product', AccessValidation, ProductController.deleteProduct);
 
-router.delete('/:id_product', AccessValidation, UserController.deleteProduct);
+export default router;
