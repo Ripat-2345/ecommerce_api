@@ -1,6 +1,6 @@
 import express from 'express';
 import CartController from '../controllers/cart_controller.js';
-import AccessValidation from '../middleware/accessValidation.js';
+import AccessValidation from '../middlewares/accessValidation.js';
 
 const router = express.Router();
 

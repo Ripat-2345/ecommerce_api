@@ -1,6 +1,7 @@
 import express from 'express';
 import AuthController from '../controllers/auth_controller.js';
-import AccessValidation from '../middleware/accessValidation.js';
+import AccessValidation from '../middlewares/accessValidation.js';
+import MiddlewareUploadImage from '../middlewares/uploadImageMiddleware.js';
 
 const router = express.Router();
 
@@ -8,13 +9,10 @@ const router = express.Router();
 router.post('/login', AuthController.login);
 
 // todo: Register - POST
-router.post('/register', AuthController.register);
+router.post('/register', MiddlewareUploadImage.single('avatar'), AuthController.register);
 
 // todo: Forgot Password - POST
 router.post('/forgot-password', AuthController.forgotPassword);
-
-// todo: Change Password - GET
-router.get('/change-password/:token', AuthController.getPayloadChangePassword);
 
 // todo: Change Password - POST
 router.post('/change-password/:id', AccessValidation, AuthController.changePassword);

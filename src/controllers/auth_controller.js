@@ -3,6 +3,8 @@ import UsersModel from '../models/user_model.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config()
 
@@ -18,7 +20,7 @@ const login = async (req, res) => {
                         const payload = {
                             status: 200,
                             message: "User Login",
-                            data: data.dataValues,
+                            idUser: data.dataValues.id,
                         }
                         const secret = process.env.JWT_SECRET;
                         const expiresIn = 60 * 60 * 1
@@ -28,7 +30,13 @@ const login = async (req, res) => {
                         res.status(200).json({
                             status: 200,
                             message: "User Login",
-                            data: data.dataValues,
+                            data: {
+                                id: data.dataValues.id,
+                                name: data.dataValues.name,
+                                username: data.dataValues.username,
+                                email: data.dataValues.email,
+                                avatar: data.dataValues.avatar,
+                            },
                             token: token,
                         });
                     } else {
@@ -54,19 +62,44 @@ const login = async (req, res) => {
 }
 
 // todo: register new user
-const register = (req, res) => {
+const register = async (req, res) => {
     let body = req.body;
+    const image = req.file.path;
     try {
-        // todo: encrypt password user
-        bcrypt.hash(body.password, 10, async (err, hash) => {
-            body.password = hash;
-            await UsersModel.create(body).then((result) => {
-                res.status(200).json({
-                    status: 200,
-                    message: "POST create new user",
-                    data: result,
-                });
+        if(!req.file){
+            res.status(422).json({
+                status: 422,
+                message: "Avatar Harus Di Upload!",
             });
+        }
+        await UsersModel.findOne({ where: { email: body.email } }).then((data) => {
+            if (data == null) {
+                body.avatar = image
+                // todo: encrypt password user
+                bcrypt.hash(body.password, 10, async (err, hash) => {
+                    body.password = hash;
+                    await UsersModel.create(body).then((result) => {
+                        res.status(200).json({
+                            status: 200,
+                            message: "POST create new user",
+                            data: {
+                                id: result.id,
+                                name: result.name,
+                                username: result.username,
+                                email: result.email,
+                                avatar: result.avatar,
+                            },
+                        });
+                    });
+                });
+            } else {
+                body.avatar = image
+                fs.unlinkSync(path.join(`images/${body.avatar.split('\\')[1]}`));
+                res.status(401).json({
+                    status: 401,
+                    message: "Email Sudah Terdaftar!",
+                });
+            }
         });
     } catch (error) {
         res.status(500).json({
@@ -85,7 +118,7 @@ const forgotPassword = async (req, res) => {
                 const payload = {
                     status: 200,
                     message: "User Data",
-                    data: data.dataValues,
+                    idUser: data.dataValues.id,
                 }
                 const secret = process.env.JWT_SECRET;
                 const expiresIn = 60 * 60 * 1
@@ -94,8 +127,8 @@ const forgotPassword = async (req, res) => {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'ripatalsafar@gmail.com',
-                        pass: 'rqpd dxxu kjle ftjz'
+                        user: process.env.MAILERNAME,
+                        pass: process.env.MAILERPASS
                     }
                 });
 
@@ -135,40 +168,19 @@ const forgotPassword = async (req, res) => {
     }
 }
 
-const getPayloadChangePassword = (req, res) => {
-    try {
-        const token = req.params.token;
-        const secret = process.env.JWT_SECRET;
-        const jwtDecode = jwt.verify(token, secret);
-        res.status(200).json({
-            ...jwtDecode
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Server Error",
-            serverMessage: error,
-        });
-    }
-}
-
 // todo: change password
 const changePassword = async (req, res) => {
-    let body = req.body;
+    const body = req.body;
     const password = req.body.password;
-    let confirmPassword = req.body.confirmPassword;
-    const idUser = req.params.id;
+    const confirmPassword = req.body.confirmPassword;
     try {
         if (password == confirmPassword) {
             bcrypt.hash(body.password, 10, async (err, hash) => {
                 body.password = hash;
-                await UsersModel.update(body, { where: { id: idUser } }).then(() => {
+                await UsersModel.update(body, { where: { id: body.id } }).then(() => {
                     res.status(200).json({
                         status: 200,
-                        message: `PATCH change password user id:${idUser}`,
-                        data: {
-                            id: +idUser,
-                            ...body
-                        },
+                        message: `PATCH change password user id:${body.id}`,
                     });
                 });
             });
@@ -190,6 +202,5 @@ export default {
     login,
     register,
     forgotPassword,
-    getPayloadChangePassword,
     changePassword
 }

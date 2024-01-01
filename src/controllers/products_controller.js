@@ -20,8 +20,16 @@ const getAllProduct = (req, res) => {
 };
 
 const createNewProduct = (req, res) => {
-    const body = req.body;
+    let body = req.body;
+    const image = req.file.path;
     try {
+        if (!req.file) {
+            res.status(422).json({
+                status: 422,
+                message: "Picture Harus Di Upload!",
+            });
+        }
+        body.picture = image
         ProductsModel.create(body).then((result) => {
             res.status(200).json({
                 status: 200,

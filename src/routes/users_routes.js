@@ -1,6 +1,7 @@
 import express from 'express';
 import UserController from '../controllers/users_controller.js';
-import AccessValidation from '../middleware/accessValidation.js';
+import AccessValidation from '../middlewares/accessValidation.js';
+import MiddlewareUploadImage from '../middlewares/uploadImageMiddleware.js';
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 router.get('/', AccessValidation, UserController.getAllUsers);
 
 // todo: CREATE - POST
-router.post('/', AccessValidation, UserController.createNewUser);
+router.post('/', [AccessValidation, MiddlewareUploadImage.single('avatar')], UserController.createNewUser);
 
 // todo: UPDATE - PATCH
 router.patch('/:id_user', AccessValidation, UserController.updateUser);
