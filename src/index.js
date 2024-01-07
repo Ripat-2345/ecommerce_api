@@ -6,6 +6,7 @@ import ProductRoutes from './routes/products_routes.js'
 import MiddlewareLogRequest from './middlewares/logs.js';
 import HeaderMiddleware from './middlewares/headerMiddleware.js'
 import dotenv from 'dotenv';
+import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -19,6 +20,7 @@ const __dirname = path.dirname(__filename);
 app.use(MiddlewareLogRequest);
 app.use(HeaderMiddleware);
 app.use(express.json());
+app.use(cors());
 app.use('/images', express.static(path.join(__dirname, '../images')));
 
 // todo: block code use route here
