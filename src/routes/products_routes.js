@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/', [AccessValidation, MiddlewareUploadImage.single('picture')], ProductController.createNewProduct);
 
 // todo: READ - GET
-router.get('/', AccessValidation, ProductController.getAllProduct);
+router.get('/', ProductController.getAllProduct);
 
 // router.get('/:id_product', AccessValidation, ProductController.getAllProduct);
 
