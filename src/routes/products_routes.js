@@ -11,9 +11,7 @@ router.post('/', [AccessValidation, MiddlewareUploadImage.single('picture')], Pr
 // todo: READ - GET
 router.get('/', ProductController.getAllProduct);
 
-// router.get('/:id_product', AccessValidation, ProductController.getAllProduct);
-
-// router.get('/:id_user', AccessValidation, ProductController.getAllProduct);
+router.get('/:id_user', AccessValidation, ProductController.getAllProductByIdUser);
 
 // todo: UPDATE - PATCH
 router.patch('/:id_product', AccessValidation, ProductController.updateProduct);

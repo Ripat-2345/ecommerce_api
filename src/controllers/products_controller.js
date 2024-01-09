@@ -2,12 +2,29 @@ import ProductsModel from '../models/products_model.js';
 
 // todo: get all cart by id_product
 const getAllProduct = (req, res) => {
-    const idProduct = req.params.id_product
     try {
         ProductsModel.findAll().then((results) => {
             res.status(200).json({
                 status: 200,
-                message: "GET all cart by id_product",
+                message: "GET all products",
+                data: results,
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Server Error",
+            serverMessage: error,
+        });
+    }
+};
+
+const getAllProductByIdUser = (req, res) => {
+    const idUser = req.params.id_user
+    try {
+        ProductsModel.findAll({where: {id_user: idUser}}).then((results) => {
+            res.status(200).json({
+                status: 200,
+                message: `GET all product by ${idUser}`,
                 data: results,
             });
         });
@@ -33,7 +50,7 @@ const createNewProduct = (req, res) => {
         ProductsModel.create(body).then((result) => {
             res.status(200).json({
                 status: 200,
-                message: "POST create new cart",
+                message: "POST create new product",
                 data: result,
             });
         });
@@ -52,7 +69,7 @@ const updateProduct = (req, res) => {
         ProductsModel.update(body, {where: {id:idProduct}}).then((result) => {
             res.status(200).json({
                 status: 200,
-                message: `PATCH update cart id:${idProduct}`,
+                message: `PATCH update product id:${idProduct}`,
                 data: {
                     id: +idProduct,
                     ...body
@@ -73,7 +90,7 @@ const deleteProduct = (req, res) => {
         ProductsModel.destroy({where: {id: idProduct}}).then(() => {
             res.status(200).json({
                 status: 200,
-                message: `DELETE delete cart id:${idProduct}`,
+                message: `DELETE delete product id:${idProduct}`,
             });
         });
     } catch (error) {
@@ -86,6 +103,7 @@ const deleteProduct = (req, res) => {
 
 export default{
     getAllProduct,
+    getAllProductByIdUser,
     createNewProduct,
     updateProduct,
     deleteProduct,
