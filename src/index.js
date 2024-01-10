@@ -3,6 +3,7 @@ import AuthRoutes from './routes/auth_routes.js';
 import UsersRoutes from './routes/users_routes.js';
 import CommentRoutes from './routes/comment_routes.js'
 import ProductRoutes from './routes/products_routes.js'
+import CartRoutes from './routes/cart_routes.js'
 import MiddlewareLogRequest from './middlewares/logs.js';
 import HeaderMiddleware from './middlewares/headerMiddleware.js'
 import dotenv from 'dotenv';
@@ -26,8 +27,9 @@ app.use('/images', express.static(path.join(__dirname, '../images')));
 // todo: block code use route here
 app.use('/auth', AuthRoutes);
 app.use('/users', UsersRoutes);
-app.use('/comments', CommentRoutes)
-app.use('/products', ProductRoutes)
+app.use('/comments', CommentRoutes);
+app.use('/products', ProductRoutes);
+app.use('/carts', CartRoutes);
 
 app.listen(PORT, () => {
     console.log(`server running in localhost:${PORT}`);

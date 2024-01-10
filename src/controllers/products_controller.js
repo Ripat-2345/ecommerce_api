@@ -1,7 +1,6 @@
 import ProductsModel from '../models/products_model.js';
 import fs from 'fs';
 import path from 'path';
-import { where } from 'sequelize';
 
 
 // todo: get all cart by id_product
