@@ -14,7 +14,7 @@ router.get('/', ProductController.getAllProduct);
 router.get('/:id_user', AccessValidation, ProductController.getAllProductByIdUser);
 
 // todo: UPDATE - PATCH
-router.patch('/:id_product', AccessValidation, ProductController.updateProduct);
+router.patch('/:id_product', [AccessValidation, MiddlewareUploadImage.single('picture')], ProductController.updateProduct);
 
 // todo: DELETE - DEL
 router.delete('/:id_product', AccessValidation, ProductController.deleteProduct);
