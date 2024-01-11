@@ -15,5 +15,5 @@ router.post('/register', MiddlewareUploadImage.single('avatar'), AuthController.
 router.post('/forgot-password', AuthController.forgotPassword);
 
 // todo: Change Password - POST
-router.post('/change-password/:id', AccessValidation, AuthController.changePassword);
+router.post('/change-password', AuthController.changePassword);
 export default router;

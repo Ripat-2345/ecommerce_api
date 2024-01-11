@@ -136,7 +136,7 @@ const forgotPassword = async (req, res) => {
                     from: 'ecommerceApp@gmail.com',
                     to: email,
                     subject: 'Change Your Password From Ecommerce App',
-                    text: `Save your link dont share : http://localhost:54003/change-password/${token}`
+                    text: `Save your link dont share : http://localhost:5000/change-password/${token}`
                 };
 
                 transporter.sendMail(mailOptions, function (error, info) {
