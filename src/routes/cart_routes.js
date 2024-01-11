@@ -11,7 +11,7 @@ router.get('/:id_user', AccessValidation, CartController.getAllCartUser);
 router.post('/', AccessValidation, CartController.createdNewCart);
 
 // todo: UPDATE - PATCH
-router.patch('/:id_cart', AccessValidation, CartController.updatedCartUser);
+router.patch('/:condition/:id_cart', AccessValidation, CartController.updatedCartUser);
 
 // todo: DELETE - DELETE
 router.delete('/:id_cart', AccessValidation, CartController.deleteCartUser);

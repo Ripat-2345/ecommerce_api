@@ -1,5 +1,6 @@
 import CartsModel from '../models/cart_model.js';
 import ProductsModel from '../models/products_model.js';
+import UsersModel from '../models/user_model.js';
 
 // todo: get all cart by id_user
 const getAllCartUser = (req, res) => {
@@ -28,7 +29,7 @@ const getAllCartUser = (req, res) => {
 const createdNewCart = (req, res) => {
     let body = req.body;
     try {
-        CartsModel.findOne({ where: { id_product: body.id_product } }).then((data) => {
+        CartsModel.findOne({ where: { id_product: body.id_product, id_user: body.id_user } }).then((data) => {
             if (data != null) {
                 body.quantity += data.quantity
                 CartsModel.update(body, { where: { id: data.id } }).then(() => {
@@ -60,18 +61,46 @@ const createdNewCart = (req, res) => {
 
 const updatedCartUser = (req, res) => {
     const idCart = req.params.id_cart;
+    const condition = req.params.condition;
     const body = req.body;
     try {
-        CartsModel.update(body, { where: { id: idCart, id_user: body.id_user } }).then((result) => {
-            res.status(200).json({
-                status: 200,
-                message: `PATCH update cart id:${idCart}`,
-                data: {
-                    id: +idCart,
-                    ...body
-                },
-            });
+        CartsModel.findOne({ where: { id: idCart } }).then((data) => {
+            if (condition == 'add') {
+                body.quantity = data.quantity + body.quantity
+                CartsModel.update(body, { where: { id: idCart } }).then(() => {
+                    res.status(200).json({
+                        status: 200,
+                        message: `PATCH update cart id:${idCart}`,
+                        data: {
+                            id: +idCart,
+                            ...body
+                        },
+                    });
+                });
+            } else if (condition == 'remove') {
+                if (data.quantity > 1) {
+                    body.quantity = data.quantity - body.quantity
+                    CartsModel.update(body, { where: { id: idCart } }).then(() => {
+                        res.status(200).json({
+                            status: 200,
+                            message: `PATCH update cart id:${idCart}`,
+                            data: {
+                                id: +idCart,
+                                ...body
+                            },
+                        });
+                    });
+                } else {
+                    CartsModel.destroy({ where: { id: idCart } }).then(() => {
+                        res.status(200).json({
+                            status: 200,
+                            message: `DELETE delete cart id:${idCart}`,
+                        });
+                    });
+                }
+            }
         });
+
     } catch (error) {
         res.status(500).json({
             message: "Server Error",
