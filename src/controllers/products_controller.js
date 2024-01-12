@@ -39,6 +39,24 @@ const getAllProductByIdUser = (req, res) => {
     }
 };
 
+const getProductByIdProduct = (req, res) => {
+    const idProduct = req.params.id_product
+    try {
+        ProductsModel.findOne({ where: { id: idProduct} }).then((results) => {
+            res.status(200).json({
+                status: 200,
+                message: `GET product by ${idProduct}`,
+                data: results,
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Server Error",
+            serverMessage: error,
+        });
+    }
+};
+
 const createNewProduct = (req, res) => {
     let body = req.body;
     const image = req.file.path;
@@ -127,6 +145,7 @@ const deleteProduct = (req, res) => {
 export default {
     getAllProduct,
     getAllProductByIdUser,
+    getProductByIdProduct,
     createNewProduct,
     updateProduct,
     deleteProduct,

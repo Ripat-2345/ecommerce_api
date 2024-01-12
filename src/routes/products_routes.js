@@ -13,6 +13,8 @@ router.get('/', ProductController.getAllProduct);
 
 router.get('/:id_user', AccessValidation, ProductController.getAllProductByIdUser);
 
+router.get('/detail/:id_product', ProductController.getProductByIdProduct);
+
 // todo: UPDATE - PATCH
 router.patch('/:id_product', [AccessValidation, MiddlewareUploadImage.single('picture')], ProductController.updateProduct);
 
