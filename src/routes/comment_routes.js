@@ -5,7 +5,7 @@ import AccessValidation from '../middlewares/accessValidation.js';
 const router = express.Router();
 
 // todo: READ - GET
-router.get('/:id_product', AccessValidation, CommentController.getAllbyIDProduct);
+router.get('/:id_product', CommentController.getAllbyIDProduct);
 
 // todo: CREATE - POST
 router.post('/', AccessValidation, CommentController.createNewComment);

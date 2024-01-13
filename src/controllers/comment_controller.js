@@ -1,10 +1,17 @@
 import CommentsModel from '../models/comment_model.js';
+import UsersModel from '../models/user_model.js';
 
 // todo: get all comment by id_product
-const getAllbyIDProduct =  async (req, res) => {
+const getAllbyIDProduct = async (req, res) => {
     const idComment = req.params.id_product
     try {
-        await CommentsModel.findAll({where: {id_product : idComment,},}).then((results) => {
+        await CommentsModel.findAll({
+            where: { id_product: idComment }, 
+            include: [{
+                model: UsersModel,
+                required: true,
+            }],
+        }).then((results) => {
             res.status(200).json({
                 status: 200,
                 message: "GET all Comment from Product",
@@ -43,7 +50,7 @@ const updateComment = (req, res) => {
     const idComment = req.params.id_comment;
     const body = req.body;
     try {
-        CommentsModel.update(body, {where: {id:idComment, id_user: body.id_user}}).then((result) => {
+        CommentsModel.update(body, { where: { id: idComment, id_user: body.id_user } }).then((result) => {
             res.status(200).json({
                 status: 200,
                 message: `PATCH update comment id:${idComment}`,
@@ -65,7 +72,7 @@ const updateComment = (req, res) => {
 const deleteComment = (req, res) => {
     const idComment = req.params.id_comment;
     try {
-        CommentsModel.destroy({where: {id: idComment}}).then(() => {
+        CommentsModel.destroy({ where: { id: idComment } }).then(() => {
             res.status(200).json({
                 status: 200,
                 message: `DELETE delete comment id:${idComment}`,

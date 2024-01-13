@@ -71,33 +71,73 @@ const createNewUser = async (req, res) => {
 
 // todo: update user
 const updateUser = async (req, res) => {
-    const idUser = req.params.id_user;
-    const body = req.body;
+    let body = req.body;
     try {
-        if ('password' in body) {
-            bcrypt.hash(body.password, 10, async (err, hash) => {
-                body.password = hash;
-                await UsersModel.update(body, { where: { id: idUser } }).then(() => {
-                    res.status(200).json({
-                        status: 200,
-                        message: `PATCH update user id:${idUser}`,
-                        data: {
-                            id: +idUser,
-                            ...body
-                        },
-                    });
+        if ('current_password' in body) {
+            UsersModel.findOne({ where: { id: body.id_user } }).then((data) => {
+                bcrypt.compare(body.current_password, data.dataValues.password).then((result) => { 
+                    if (result == true) {
+                        bcrypt.hash(body.password, 10, async (err, hash) => {
+                            body.password = hash;
+                            if (typeof req.file !== 'undefined') {
+                                body.avatar = req.file.path;
+                            }
+                            UsersModel.update(body, { where: { id: body.id_user } }).then(() => {
+                                if (typeof req.file !== 'undefined') {
+                                    fs.unlinkSync(path.join(`images/${data.avatar.split('\\')[1]}`));
+                                }
+                                res.status(200).json({
+                                    status: 200,
+                                    message: `PATCH update user id:${body.id_user}`,
+                                });
+                            });
+                        });
+                    }else{
+                        res.status(404).json({
+                            status: 404,
+                            message: "Invalid Current Password",
+                        });
+                    }
                 });
             });
         } else {
-            await UsersModel.update(body, { where: { id: idUser } }).then(() => {
-                res.status(200).json({
-                    status: 200,
-                    message: `PATCH update user id:${idUser}`,
-                    data: {
-                        id: +idUser,
-                        ...body
-                    },
-                });
+            if (typeof req.file !== 'undefined') {
+                body.avatar = req.file.path;
+            }
+            UsersModel.findOne({ where: { id: body.id_user } }).then((data) => {
+                if ('email' in body) {
+                    if (data.email == body.email) {
+                        UsersModel.update({ avatar: body.avatar }, { where: { id: body.id_user } }).then(() => {
+                            if (typeof req.file !== 'undefined') {
+                                fs.unlinkSync(path.join(`images/${data.avatar.split('\\')[1]}`));
+                            }
+                            res.status(400).json({
+                                status: 400,
+                                message: "Email Sudah Ada!",
+                            });
+                        });
+                    } else {
+                        UsersModel.update(body, { where: { id: body.id_user } }).then(() => {
+                            if (typeof req.file !== 'undefined') {
+                                fs.unlinkSync(path.join(`images/${data.avatar.split('\\')[1]}`));
+                            }
+                            res.status(200).json({
+                                status: 200,
+                                message: `PATCH update user id:${body.id_user}`,
+                            });
+                        });
+                    }
+                } else {
+                    UsersModel.update(body, { where: { id: body.id_user } }).then(() => {
+                        if (typeof req.file !== 'undefined') {
+                            fs.unlinkSync(path.join(`images/${data.avatar.split('\\')[1]}`));
+                        }
+                        res.status(200).json({
+                            status: 200,
+                            message: `PATCH update user id:${body.id_user}`,
+                        });
+                    });
+                }
             });
         }
     } catch (error) {
@@ -110,12 +150,12 @@ const updateUser = async (req, res) => {
 
 // todo: delete user
 const deleteUser = async (req, res) => {
-    const idUser = req.params.id_user;
+    const body = req.body;
     try {
-        UsersModel.destroy({ where: { id: idUser } }).then(() => {
+        UsersModel.destroy({ where: { id: body.id_user } }).then(() => {
             res.status(200).json({
                 status: 200,
-                message: `DELETE delete user id:${idUser}`,
+                message: `DELETE delete user id:${body.id_user}`,
             });
         });
     } catch (error) {

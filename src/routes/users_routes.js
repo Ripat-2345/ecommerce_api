@@ -12,9 +12,9 @@ router.get('/', AccessValidation, UserController.getAllUsers);
 router.post('/', [AccessValidation, MiddlewareUploadImage.single('avatar')], UserController.createNewUser);
 
 // todo: UPDATE - PATCH
-router.patch('/:id_user', AccessValidation, UserController.updateUser);
+router.patch('/', [AccessValidation,  MiddlewareUploadImage.single('avatar')], UserController.updateUser);
 
 // todo: DELETE - DELETE
-router.delete('/:id_user', AccessValidation, UserController.deleteUser);
+router.delete('/', AccessValidation, UserController.deleteUser);
 
 export default router;
